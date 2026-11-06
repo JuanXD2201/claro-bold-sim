@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: claro-bold-sim
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m orq
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: ORQ_HOST
+        value: 0.0.0.0
+      - key: ORQ_ALLOWED_HOSTS
+        value: "*.onrender.com"
