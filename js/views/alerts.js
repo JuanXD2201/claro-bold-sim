@@ -12,7 +12,8 @@ export default {
     const stateParam = (p) => (p === 'all' ? '' : (p ?? 'open'));        // en la URL "all" = sin filtro de estado
     const f = { state: stateParam(params.state), type: params.type || '', severity: params.severity || '' };
     let items = [], first = true;
-    const sel = (key, label, opts) => h('label', null, label, h('select', { onchange: (ev) => { f[key] = ev.target.value; setParams(f.state === '' ? { ...f, state: 'all' } : f); update(); } },
+    const selects = {};
+    const sel = (key, label, opts) => h('label', null, label, selects[key] = h('select', { onchange: (ev) => { f[key] = ev.target.value; setParams(f.state === '' ? { ...f, state: 'all' } : f); update(); } },
       h('option', { value: '' }, 'Todas'), opts.map(([v, t]) => h('option', { value: v, selected: f[key] === v }, t))));
     const bulk = h('div', { class: 'bulkbar', hidden: true });
     const body = h('div');
@@ -54,6 +55,10 @@ export default {
       try { items = (await get('/orchestrator/alerts' + qs({ state: f.state, type: f.type, severity: f.severity }))).items; first = false; render(); }
       catch (e) { if (first) stateBox(body, 'error', `No se pudieron cargar las alertas: ${e.message}`, update); }
     }
-    return { update, onParams(p) { f.state = stateParam(p.state); update(); } };
+    return { update, onParams(p) {      // el enlace cambió desde fuera (campana, otro enlace): sincroniza filtros y selectores
+      f.state = stateParam(p.state); f.type = p.type || ''; f.severity = p.severity || '';
+      for (const k of Object.keys(selects)) selects[k].value = f[k];
+      update();
+    } };
   },
 };
