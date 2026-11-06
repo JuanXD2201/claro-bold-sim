@@ -11,9 +11,11 @@ SITE = ROOT / "site"
 
 
 def main():
-    if SITE.exists():
-        shutil.rmtree(SITE)
-    shutil.copytree(ROOT / "web", SITE)
+    SITE.mkdir(exist_ok=True)
+    for item in SITE.iterdir():            # conserva site/.git para republicar en gh-pages sin forzar el push
+        if item.name != ".git":
+            shutil.rmtree(item) if item.is_dir() else item.unlink()
+    shutil.copytree(ROOT / "web", SITE, dirs_exist_ok=True)
     with zipfile.ZipFile(SITE / "orq.zip", "w", zipfile.ZIP_DEFLATED) as z:
         for f in sorted((ROOT / "orq").rglob("*.py")):
             z.write(f, f.relative_to(ROOT).as_posix())

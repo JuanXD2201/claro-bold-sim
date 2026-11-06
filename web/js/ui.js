@@ -1,6 +1,6 @@
 // Componentes compartidos: diálogos, estados (carga/vacío/error), movimiento de SIMs, enlaces.
 import { get, post } from './api.js';
-import { h, clear, fmt, toast, pretty, setParams, buildHash } from './util.js';
+import { h, clear, add, fmt, toast, pretty, setParams, buildHash } from './util.js';
 import { refresh } from './store.js';
 
 /** Diálogo modal nativo (<dialog>): trampa de foco y Esc gratis. Devuelve el `value` de la acción pulsada. */
@@ -75,7 +75,7 @@ export async function moveSims(iccids, { target = null } = {}) {
         if (iccids.length === 1) {
           const r = await post('/orchestrator/moves', { iccid: iccids[0], pool_id: sel.value, reason: reason.value || null });
           changed = true;
-          result.append(h('div', { class: 'badge ' + (r.move.state === 'executed' ? 'ok' : r.move.state === 'failed' ? 'danger' : 'warn') },
+          add(result, h('div', { class: 'badge ' + (r.move.state === 'executed' ? 'ok' : r.move.state === 'failed' ? 'danger' : 'warn') },
             `Movimiento #${r.move.id}: ${r.move.state}` + (r.deferred ? ` (diferido, Retry-After ${r.retry_after}s)` : '')),
             r.api ? h('p', null, `Respuesta de la API: HTTP ${r.api.status}` + (r.api.latency_ms ? ` · ${fmt.ms(r.api.latency_ms)}` : '')) : null,
             r.api ? h('pre', { class: 'json' }, pretty(r.api.body)) : null);

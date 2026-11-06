@@ -76,7 +76,7 @@ class ApiLogMiddleware:
         t0 = time.perf_counter()
         await self.app(scope, recv, snd)
         sim = self.sim_getter()
-        if client == "ui" and method == "GET":
+        if client == "ui" and (method == "GET" or path.endswith("/rules/preview")):   # lecturas de la UI: no se registran
             return
         qs = scope.get("query_string", b"").decode()
         sim.apilog.add(source=client, method=method, path=path + (f"?{qs}" if qs else ""), status=status[0],

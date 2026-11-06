@@ -1,7 +1,7 @@
 // Reglas: editar umbrales y modo con vista previa de los movimientos que propondría antes de guardar.
 import { get, put, post } from '../api.js';
 import { refresh } from '../store.js';
-import { h, clear, fmt, toast, debounce } from '../util.js';
+import { h, clear, add, toast, debounce } from '../util.js';
 import { stateBox, simLink } from '../ui.js';
 
 export default {
@@ -57,7 +57,7 @@ export default {
         const p = await post('/orchestrator/rules/preview', form);
         if (mine !== seq) return;
         clear(errBox);
-        clear(previewBox).append(h('h2', null, 'Vista previa (no se guarda)'),
+        add(clear(previewBox), h('h2', null, 'Vista previa (no se guarda)'),
           h('p', { class: 'muted' }, `Con esta configuración y el estado actual (día ${p.day}) el orquestador propondría ${p.proposals.length} movimiento(s).`),
           p.note ? h('div', { class: 'badge warn' }, p.note) : null,
           p.proposals.length ? h('div', { class: 'tablewrap' }, h('table', null, h('thead', null, h('tr', null, ['SIM', 'Comercio', 'Ruta', 'Motivo'].map((t) => h('th', null, t)))),

@@ -26,6 +26,8 @@ function build(el, attrs, kids) {
 export const h = (tag, attrs, ...kids) => build(document.createElement(tag), attrs, kids);
 export const svg = (tag, attrs, ...kids) => build(document.createElementNS('http://www.w3.org/2000/svg', tag), attrs, kids);
 export const clear = (el) => { el.replaceChildren(); return el; };
+/** Como el.append, pero ignora null/false (el append nativo los escribiría como texto "null"). */
+export const add = (el, ...kids) => { appendKids(el, kids); return el; };
 
 export const fmt = {
   mb: (v, d = 1) => (v == null ? '—' : Number(v).toLocaleString('es-CO', { maximumFractionDigits: d, minimumFractionDigits: 0 }) + ' MB'),
