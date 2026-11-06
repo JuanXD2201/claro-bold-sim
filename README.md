@@ -16,16 +16,21 @@ python -m venv .venv
 - UI: <http://127.0.0.1:8000/> · Swagger/OpenAPI: <http://127.0.0.1:8000/docs>
 - Estado persistente en `data/sim.db` (SQLite). «Reiniciar todo» en la UI vuelve a la semilla inicial.
 
-## Publicarlo en un link (Render, gratis)
+## Versión publicada (GitHub Pages)
 
-GitHub Pages no sirve (solo archivos estáticos; aquí hace falta el backend Python). Con el repo público:
+**https://juanxd2201.github.io/claro-bold-sim/** — se abre desde cualquier navegador, sin instalar ni arrancar nada.
 
-1. Entra a <https://render.com/deploy?repo=https://github.com/JuanXD2201/claro-bold-sim> e inicia sesión (puede ser con GitHub).
-2. Confirma. Render lee `render.yaml`, instala dependencias y arranca `python -m orq`.
-3. El link queda como `https://claro-bold-sim.onrender.com` (o similar). El plan gratis se duerme tras ~15 min sin uso: la primera visita tarda ~1 min.
+El simulador Python corre dentro del navegador (Pyodide/WebAssembly): la UI detecta que no hay servidor y lo inicia sola.
+La primera carga descarga el motor Python (~10 MB, unos segundos); después queda en caché. Cada visitante tiene su propia
+simulación en memoria (se reinicia al recargar la página). Requiere internet para bajar Pyodide y `fastapi` (CDN/PyPI).
 
-Variables (ya en `render.yaml`): `ORQ_HOST=0.0.0.0`, `PORT` (la pone Render), `ORQ_ALLOWED_HOSTS=*.onrender.com`.
-Ojo: en la versión publicada todos los visitantes comparten la misma simulación y el estado se pierde al reiniciar el servicio.
+Para actualizar la página tras cambiar el código:
+
+```bash
+python scripts/build_site.py                 # genera site/
+cd site && git init -q -b gh-pages && git add -A && git commit -qm "Publicar sitio" \
+  && git push -f https://github.com/JuanXD2201/claro-bold-sim.git gh-pages
+```
 
 ## Pruebas
 

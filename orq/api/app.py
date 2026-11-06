@@ -80,14 +80,14 @@ class ApiLogMiddleware:
             return
         qs = scope.get("query_string", b"").decode()
         sim.apilog.add(source=client, method=method, path=path + (f"?{qs}" if qs else ""), status=status[0],
-                       latency_ms=round((time.perf_counter() - t0) * 1000, 1),
+                       latency_ms=round((time.perf_counter() - t0) * 1000 + scope.get("state", {}).get("fake_latency_ms", 0), 1),
                        request=_short(b"".join(req)), response=_short(b"".join(resp)),
                        retry_after=(status[1].get("retry-after") if len(status) > 1 else None))
         if method != "GET":
             sim.bump()
 
 
-def create_app(sim=None, db_path=None, run_clock=True):
+def create_app(sim=None, db_path=None, run_clock=True, serve_static=True):
     holder = {}
 
     @asynccontextmanager
@@ -139,7 +139,7 @@ def create_app(sim=None, db_path=None, run_clock=True):
     app.include_router(routes_platform.router)
     app.include_router(routes_orch.router)
     app.include_router(routes_sim.router)
-    if WEB_DIR.exists():
+    if serve_static and WEB_DIR.exists():
         app.mount("/", StaticFiles(directory=WEB_DIR, html=True), name="web")
     return app
 

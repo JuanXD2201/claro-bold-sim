@@ -1,4 +1,5 @@
 // Arranque: barra superior, navegación por hash, vistas, panel lateral de SIM, atajos y tema.
+import { boot } from './backend.js';
 import { get, post } from './api.js';
 import { store, startLive, refresh } from './store.js';
 import { h, clear, parseHash, buildHash, toast } from './util.js';
@@ -74,7 +75,6 @@ function buildTopbar() {
   el.speeds = [1, 5, 20].map(sp);
   el.mode = h('a', { class: 'badge', href: '#/rules', title: 'Modo del orquestador (clic para configurar)' });
   el.count = h('span', { class: 'count', hidden: true });
-  el.live = h('span', { class: 'badge', title: 'Conexión de eventos en vivo' });
   topbar.append(
     h('span', { class: 'brand' }, 'Pools de datos · simulador'),
     h('span', { class: 'grp' }, el.clock, el.state),
@@ -84,15 +84,13 @@ function buildTopbar() {
       h('button', { onclick: actions.closePeriod }, 'Reiniciar periodo'),
       h('button', { class: 'danger', onclick: actions.resetAll }, 'Reiniciar todo'),
       h('button', { onclick: actions.scenarios }, 'Escenarios')),
-    h('span', { class: 'spacer' }), el.live, el.mode,
+    h('span', { class: 'spacer' }), el.mode,
     h('a', { href: '#/alerts?state=open', class: 'bell', 'aria-label': 'Alertas abiertas', title: 'Alertas abiertas' }, h('button', { tabindex: -1, 'aria-hidden': 'true' }, 'Alertas'), el.count),
     h('button', { onclick: toggleTheme, title: 'Cambiar tema claro/oscuro' }, 'Tema'),
     h('button', { onclick: showHelp, title: 'Atajos de teclado (?)' }, '?'));
 }
 function updateTopbar() {
   const c = store.clock, s = store.summary;
-  el.live.textContent = store.error ? 'Sin conexión' : store.live ? 'En vivo' : 'Sondeo';
-  el.live.className = 'badge ' + (store.error ? 'danger' : store.live ? 'ok' : 'warn');
   if (!c) { el.clock.textContent = 'Conectando…'; return; }
   el.clock.textContent = `Periodo ${c.period} · Día ${c.day}/${c.period_days}`;
   el.state.textContent = { running: 'en curso', paused: 'en pausa', period_end: 'fin de periodo' }[c.state];
@@ -161,9 +159,18 @@ document.addEventListener('keydown', (ev) => {
 });
 document.addEventListener('simdrawer', () => drawer.sync());
 
+const bootBox = document.getElementById('boot');
+try {
+  await boot((msg) => { document.getElementById('boot-msg').textContent = msg; });
+} catch (e) {
+  document.getElementById('boot-msg').textContent = `No se pudo iniciar el simulador: ${e.message}. Revisa tu conexión y recarga la página.`;
+  throw e;
+}
 buildTopbar();
 buildNav();
 store.on(liveUpdate);
 window.addEventListener('hashchange', route);
+await refresh();          // el reloj y el resumen ya están cargados cuando se muestra la pantalla
 route();
 startLive();
+bootBox.remove();

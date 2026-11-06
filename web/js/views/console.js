@@ -49,7 +49,7 @@ export default {
     };
     const testerPanel = h('div', { class: 'panel' }, h('h2', null, 'Probador de endpoints'), h('div', { class: 'row' }, preset, method, h('button', { class: 'primary', onclick: send }, 'Enviar')),
       h('label', { style: { marginTop: '8px' } }, 'Ruta', path), h('label', null, 'Cuerpo', reqBody), h('div', { class: 'row', style: { margin: '6px 0' } }, h('label', null, 'Cabecera', idem), h('button', { onclick: () => { idem.value = 'k-' + Math.random().toString(36).slice(2, 10); } }, 'Generar clave')), out,
-      h('p', { class: 'muted' }, 'Se envía con X-Client: tester, así que cuenta para el límite de tasa y sufre las fallas inyectadas. Documentación completa en ', h('a', { href: '/docs', target: '_blank', rel: 'noopener' }, '/docs'), '.'));
+      h('p', { class: 'muted' }, 'Se envía con X-Client: tester, así que cuenta para el límite de tasa y sufre las fallas inyectadas. Documentación completa en ', window.__STATIC__ ? 'el README del repositorio' : h('a', { href: '/docs', target: '_blank', rel: 'noopener' }, '/docs'), '.'));
 
     // ------------------------------------------------ condiciones
     const lat = h('input', { type: 'number', id: 'c-lat', min: 0, max: 5000, step: 10, style: { width: '90px' } });

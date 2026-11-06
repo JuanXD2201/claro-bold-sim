@@ -1,7 +1,7 @@
 // Resumen: tarjetas, uso por pool vs capacidad (con umbrales y proyección) y reporte mensual.
 import { get } from '../api.js';
 import { store } from '../store.js';
-import { h, clear, fmt, downloadText, pretty, poolColor, levelClass, levelText } from '../util.js';
+import { h, clear, fmt, downloadText, downloadApi, pretty, poolColor, levelClass, levelText } from '../util.js';
 import { stateBox } from '../ui.js';
 import { lineChart } from '../charts.js';
 
@@ -75,7 +75,7 @@ export default {
       const t = rep.totals;
       clear(repBox).append(h('div', { class: 'row' }, h('h2', { style: { margin: 0 } }, 'Reporte mensual consolidado'), sel, h('span', { class: 'spacer' }),
         h('span', { class: `badge ${rep.reconciled ? 'ok' : 'danger'}`, title: `Suma directa de consumo: ${fmt.mb(rep.direct_total_mb, 2)}` }, rep.reconciled ? `Total = Σ pools ✓ (${fmt.mb(t.used_mb, 1)})` : 'No concilia'),
-        h('a', { class: 'badge info', href: `/orchestrator/reports/monthly?period=${rep.period}&format=csv`, download: '' }, 'Exportar CSV'),
+        h('button', { onclick: () => downloadApi(`/orchestrator/reports/monthly?period=${rep.period}&format=csv`, `reporte_periodo_${rep.period}.csv`) }, 'Exportar CSV'),
         h('button', { onclick: () => downloadText(`reporte_periodo_${rep.period}.json`, pretty(rep), 'application/json') }, 'Exportar JSON')),
         h('div', { class: 'tablewrap', style: { marginTop: '8px' } }, h('table', null,
           h('thead', null, h('tr', null, ['Pool', 'Capacidad', 'Consumo', 'Excedente', 'Utilización', 'SIMs', 'Entran', 'Salen'].map((x, i) => h('th', { class: i ? 'num' : '' }, x)))),

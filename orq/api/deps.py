@@ -1,4 +1,5 @@
 """Dependencias compartidas de las rutas."""
+import os
 import time
 from dataclasses import dataclass
 
@@ -19,9 +20,14 @@ def get_ctx(request: Request) -> Ctx:
     return Ctx(request.app.state.sim, client, not (client == "ui" and request.method == "GET"))
 
 
-def simulate_latency(ctx: Ctx = Depends(get_ctx)):
-    if ctx.gated:
-        time.sleep(ctx.sim.platform.sample_latency() / 1000)
+def simulate_latency(request: Request, ctx: Ctx = Depends(get_ctx)):
+    if not ctx.gated:
+        return
+    ms = ctx.sim.platform.sample_latency()
+    if os.environ.get("ORQ_FAKE_LATENCY"):
+        request.state.fake_latency_ms = ms      # modo navegador: no se bloquea el hilo; el registro suma la latencia simulada
+    else:
+        time.sleep(ms / 1000)
 
 
 def unwrap(result):

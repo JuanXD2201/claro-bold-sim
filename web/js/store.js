@@ -32,8 +32,12 @@ function schedule() {   // fusiona ráfagas de eventos (p. ej. 20x) en una actua
 
 export function startLive() {
   refresh();
+  if (window.__STATIC__) {                       // backend en el navegador: no hay SSE, el puente avisa con un evento
+    window.addEventListener('simchange', schedule);
+    return;
+  }
   let es;
-  try { es = new EventSource('/sim/events'); } catch { es = null; }
+  try { es = new EventSource('sim/events'); } catch { es = null; }
   if (es) {
     es.addEventListener('state', (ev) => {
       store.live = true;

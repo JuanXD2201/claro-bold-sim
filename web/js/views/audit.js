@@ -1,6 +1,6 @@
 // Auditoría: filtros por actor, evento, entidad y fecha; paginación y exportación CSV.
 import { get } from '../api.js';
-import { h, clear, fmt, qs, setParams, debounce } from '../util.js';
+import { h, clear, fmt, qs, setParams, debounce, downloadApi } from '../util.js';
 import { stateBox } from '../ui.js';
 
 const PAGE = 100;
@@ -12,7 +12,7 @@ export default {
     const actorSel = h('select', { id: 'au-actor', onchange: (ev) => { f.actor = ev.target.value; apply(); } }, h('option', { value: '' }, 'Todos'));
     const text = (key, label, ph) => h('label', null, label, h('input', { value: f[key], placeholder: ph, oninput: debounce((ev) => { f[key] = ev.target.value.trim(); apply(); }) }));
     const date = (key, label) => h('label', null, label, h('input', { type: 'date', value: f[key], onchange: (ev) => { f[key] = ev.target.value; apply(); } }));
-    const exportLink = h('a', { class: 'badge info', download: '' }, 'Exportar CSV');
+    const exportLink = h('button', { onclick: () => downloadApi('/orchestrator/audit.csv' + qs(f), 'auditoria.csv') }, 'Exportar CSV');
     const body = h('div');
     root.append(h('h1', null, 'Auditoría'), h('div', { class: 'filters' }, h('label', null, 'Actor', actorSel), text('event', 'Evento (prefijo)', 'move., alert., rules…'), text('entity', 'Entidad / ID', 'ICCID, id…'),
       date('date_from', 'Desde'), date('date_to', 'Hasta'), exportLink), body);
@@ -20,7 +20,6 @@ export default {
     function apply() { limit = PAGE; setParams(f); update(); }
 
     async function update() {
-      exportLink.href = '/orchestrator/audit.csv' + qs(f);
       if (first) stateBox(body, 'loading');
       try {
         const d = await get('/orchestrator/audit' + qs({ ...f, limit }));

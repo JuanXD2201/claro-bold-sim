@@ -79,6 +79,14 @@ export function downloadText(name, text, type = 'text/csv') {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+/** Descarga el resultado de un endpoint (funciona con servidor y con el backend en el navegador). */
+export async function downloadApi(path, filename) {
+  const r = await fetch(path, { headers: { 'X-Client': 'ui' } });
+  if (!r.ok) { toast(`No se pudo exportar (HTTP ${r.status})`, 'err'); return; }
+  downloadText(filename, await r.text());
+  toast(`Descargado ${filename}`, 'ok');
+}
+
 export function toCSV(rows, cols) {
   const esc = (v) => { const s = v == null ? '' : String(v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
   return [cols.join(','), ...rows.map((r) => cols.map((c) => esc(r[c])).join(','))].join('\n');

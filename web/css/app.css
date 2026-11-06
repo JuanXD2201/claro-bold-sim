@@ -94,6 +94,7 @@ pre.json{margin:4px 0 0;padding:8px;background:var(--surface-2);border-radius:6p
 .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;margin-top:4px}.legend i{display:inline-block;width:18px;height:3px;vertical-align:middle;margin-right:4px}
 .tip{position:fixed;pointer-events:none;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px;box-shadow:var(--shadow);z-index:70}
 .split{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:12px}
+.boot{position:fixed;inset:0;z-index:200;display:grid;place-items:center;background:var(--bg);text-align:center;padding:24px}
 .split>*,.split>*>*{min-width:0}
 .panel{overflow-x:auto}
 @media (max-width:900px){.split{grid-template-columns:minmax(0,1fr)}}
