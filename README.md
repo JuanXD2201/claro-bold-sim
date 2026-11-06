@@ -3,7 +3,7 @@
 Aplicación web **local** para simular cómo un orquestador reparte 60 SIMs de datáfonos en pools de datos.
 Todo es sintético y determinista (semilla fija); **no se conecta a ningún sistema real**. Escucha solo en `127.0.0.1`.
 
-Guía con capturas de cada sección: [docs/GUIA.md](docs/GUIA.md).
+Guía con capturas de cada sección: [docs/GUIA.md](docs/GUIA.md). Informe de pruebas en Word con capturas: [docs/Informe_pruebas.docx](docs/Informe_pruebas.docx).
 
 ## Instalación y arranque
 
